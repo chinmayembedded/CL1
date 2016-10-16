@@ -1,0 +1,61 @@
+object a_1
+{
+	def bsearch(beg:Int, end:Int, myarray:Array[Int], search:Int):Int=
+	{
+		println("Hello")
+		var mid:Int=0
+		mid = (beg+end)/2
+		if(beg>end)
+		{
+			return -1
+		}
+		else if(search == myarray(mid))
+		{
+			return mid
+		}
+		else if(search > myarray(mid))
+		{
+			bsearch(mid+1,end,myarray,search)
+		}
+		else
+		{
+			bsearch(beg,mid-1,myarray,search)
+		}
+	}
+	def main(args:Array[String])
+	{
+		println("enter no of elements")
+		val n = Console.readInt()
+		var i=0			
+		var myarray:Array[Int] = new Array[Int](n);
+		for(i<- 0 to n-1)
+		{
+			myarray(i)=Console.readInt()
+		}
+		println("Given array")
+		for(i<- 0 to n-1)
+		{
+			println(myarray(i))
+		}
+		scala.util.Sorting.quickSort(myarray)
+		println("Sorted array")
+		for(i<- 0 to n-1)
+		{
+			println(myarray(i))
+		}
+		println("enter no to search")
+		val search = Console.readInt()
+		var beg = 0
+		var end = n-1
+		var ret=0;
+		ret = bsearch(beg,end,myarray,search)
+		if(ret<0)
+		{
+			println("Element not found")
+		}
+		else
+		{
+			println(s"Element found at $ret")
+		}
+	}
+}

@@ -1,0 +1,27 @@
+line	Lexeme	Token
+1	#include	Preprocessor directive
+1	<stdio.h>	Header file
+3	int	Datatype
+3	main	Keyword
+3	(	Symbol
+3	)	Symbol
+4	{	Symbol
+5	int	Datatype
+5	a	Identifier
+=5	5	Number
+5	;	Symbol
+6	int	Datatype
+6	b	Identifier
+6	;	Symbol
+7	int	Datatype
+7	c	Identifier
+=7	10	Number
+7	;	Symbol
+	8	printf	library function
+8	(	Symbol
+8	"	Symbol
+8	Hello	Identifier
+8	"	Symbol
+8	)	Symbol
+8	;	Symbol
+9	}	Symbol

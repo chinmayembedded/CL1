@@ -1,0 +1,60 @@
+%{
+#include<stdio.h>
+int line=1;
+%}
+
+%%
+
+"/*"(.|\n)*"*/" {printf("%s is a multiline comment");}
+"//"(.)* {printf("%s is a single comment");}
+
+"#include" {printf("%s is preprocesseor directive\n"); fprintf(yyout,"%d\t%s\tPreprocessor directive",line,yytext);}
+"<"((.)*.h)">" {printf("%s is a header\n"); fprintf(yyout, "%d\t%s\tHeader file",line,yytext);}
+
+(printf) {printf("%s is a function\n"); fprintf(yyout, "%d\t%s\tFunction",line,yytext);}
+
+scanf {printf("%s is a function\n"); fprintf(yyout, "%d\t%s\tFunction",line,yytext);}
+
+scanf[^(] { printf("%s is a error\n"); fprintf(yyout, "%d\t%s\tError function",line,yytext);}
+printf[^(] {printf("%s is a error\n"); fprintf(yyout, "%d\t%s\tError function",line,yytext);}
+
+return |
+for |
+main {printf("%s is a keyword\n");	fprintf(yyout, "%d\t%s\tKeyword",line,yytext);}
+
+int |
+float |
+char {printf("%s is a datatype\n"); fprintf(yyout,"%d\t%s\tdatatype",line,yytext);}
+[><*=(){},.";:/\\] {printf("%s is a symbol");	fprintf(yyout,"%d\t%s\tSymbol",line,yytext);}
+
+%d |
+%s |
+%f |
+%c |
+%u {printf("%s is the format specifier\n",yytext);fprintf(yyout,"%d\t%s\tFormat specifier\n",line,yytext);}
+
+[A-Za-z_][A-Za-z0-9]* {printf("%s is identifier"); fprintf(yyout,"%d\t%s\tIdentifier",line,yytext);}
+[0-9]+ {printf("%s is the number\n",yytext);fprintf(yyout,"%d\t%s\tNumber\n",line,yytext);}
+"\n" {++line;}
+" " ;
+
+
+%%
+int main()
+{
+	yyin = fopen("myfile.c","r");
+	yyout = fopen("myfile1.txt","w");
+
+	fprintf(yyout,"LINE\t LEXEME \t TOKEN\n");
+	yylex();
+	fclose(yyin);
+	return 0;
+}
+int yywrap()
+{
+	return 1;
+}
+void yyerror()
+{
+	printf("ERROR\n");
+}

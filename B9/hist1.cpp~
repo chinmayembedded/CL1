@@ -1,0 +1,60 @@
+#include<iostream>
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/core/core.hpp"
+using namespace std;
+using namespace cv;
+int main()
+{
+	Mat src,dst;
+	
+	src = imread("Lenna.png",CV_LOAD_IMAGE_GRAYSCALE);
+	if(!src.data)
+	{
+		cout<<"ERROR";
+		return -1;
+	}
+	namedWindow("original Image",CV_WINDOW_AUTOSIZE);	
+	imshow("original Image",src);
+	int size = src.rows * src.cols;
+	Mat hist = Mat::zeros(1,256,CV_32SC1);
+
+	for(int i=0;i<src.rows;i++)
+	{
+		for(int j=0;j<src.cols;j++)
+		{
+			hist.at<int>((int)src.at<uchar>(i,j))+=1;
+		}
+	}
+	namedWindow("Histogram",CV_WINDOW_AUTOSIZE);
+	namedWindow("EQ_Histogram",CV_WINDOW_AUTOSIZE);	
+//	imshow("Histogram",hist);
+	float sum=0.0;
+	float temp[256];
+	Mat hist_eq = Mat::zeros(1,256,CV_32SC1);
+	for(int i=0;i<256;i++)
+	{
+		temp[i] = (float)hist.at<int>(i)/(float)size;
+		sum+=temp[i];
+		temp[i] = sum * 255.0;
+		temp[i] = (floor)(temp[i]+0.5);
+		hist_eq.at<int>((int)temp[i]) += hist.at<int>(i);
+	}	
+	normalize(hist,hist,0,256,NORM_MINMAX,-1,Mat());
+	normalize(hist_eq,hist_eq,0,256,NORM_MINMAX,-1,Mat());
+
+	Mat canvas1(300,256,CV_8UC1);
+	Mat canvas2(300,256,CV_8UC1);
+
+
+	for(int i=0;i<256;i++)
+	{
+		line(canvas1, Point(i,299), Point(i,310-hist.at<int>(i)),Scalar(200,200,200));
+		line(canvas2, Point(i,299), Point(i,310-hist_eq.at<int>(i)),Scalar(200,200,200));
+	}
+	imshow("Histogram",canvas1);
+	imshow("EQ_Histogram",canvas2);
+		
+	waitKey(0);
+	return 0;
+}

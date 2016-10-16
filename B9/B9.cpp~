@@ -1,0 +1,92 @@
+#include<iostream>
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/core/core.hpp"
+#include<iomanip>
+using namespace std;
+using namespace cv;
+int main()
+{
+	Mat image, dst;
+	Vec3b intensity;
+	image = imread("Lenna.png", CV_LOAD_IMAGE_COLOR);
+	if(!image.data)
+	{
+		cout<<"INVALID PATH";
+		return 0;
+	}
+	int size = image.rows * image.cols;
+	//Original image
+	namedWindow("ORIGINAL IMAGE",CV_WINDOW_AUTOSIZE);
+	imshow("ORIGINAL IMAGE", image);
+	//Grayscale image
+	cvtColor(image, image, cv::COLOR_BGR2GRAY);
+	imshow("GRAY SCALE", image);
+
+	namedWindow("Normal histogram", CV_WINDOW_AUTOSIZE);
+		namedWindow("HIST EQ WITHOUT CV", CV_WINDOW_AUTOSIZE);
+		namedWindow("HIST EQ WITH CV", CV_WINDOW_AUTOSIZE);
+
+
+	//long int *count = new long int[256];
+	Mat hist= Mat::zeros(1,256, CV_32SC1);
+	for(int i=0;i<image.rows-1;i++)
+	{
+		for(int j=0;j<image.cols-1;j++)
+		{
+			hist.at<int>((int)image.at<uchar>(i,j))+=1;			
+		}
+	}
+	
+
+	//HIST EQ without opencv
+	float sum = 0.0;
+	float temp[256];
+	Mat eq_hist = Mat::zeros(1,256,CV_32SC1);
+	for(int i=0;i<256;i++)
+	{
+		temp[i] = (float)(hist.at<int>(i))/(float)size;
+		sum+=temp[i];
+		temp[i] = sum * (float)255;
+		temp[i] = (floor)(temp[i] + 0.5);
+		eq_hist.at<int>(int(temp[i]))+=hist.at<int>(i);
+	}
+	
+	//HIST EQ OPENCV
+	Mat eq_img;
+	equalizeHist(image,eq_img);
+	Mat eq_hist_cv = Mat::zeros(1,256, CV_32SC1);
+	for(int i=0;i<eq_img.rows;i++)
+	{
+		for(int j=0;j<eq_img.cols;j++)
+		{
+			eq_hist_cv.at<int>((int)eq_img.at<uchar>(i,j))+=1;
+		}
+	} 
+	
+	normalize(hist, hist, 0, 256, NORM_MINMAX, -1, Mat());
+	normalize(eq_hist, eq_hist,0 ,256, NORM_MINMAX, -1, Mat());
+	normalize(eq_hist_cv, eq_hist_cv, 0, 256, NORM_MINMAX, -1, Mat());
+
+	Mat canvas(300, 256 , CV_8UC1);
+	Mat canvas2(300, 256, CV_8UC1);
+	Mat canvas3(300, 256, CV_8UC1);
+		for(int i=0;i<256;i++)
+		{
+			line(canvas, Point(i,299), Point(i,300-hist.at<int>(i)), Scalar(200,200,200));
+		}
+		
+		imshow("Normal histogram",canvas);
+		for(int i=0;i<256;i++)
+		{
+			line(canvas2, Point(i,299), Point(i, 300-eq_hist.at<int>(i)), Scalar(200, 200, 200));
+		}
+		imshow("HIST EQ WITHOUT CV",canvas2);
+		for(int i=0;i<256;i++)
+		{
+			line(canvas3, Point(i,299), Point(i, 300-eq_hist_cv.at<int>(i)), Scalar(200,200,200));
+		}
+		imshow("HIST EQ WITH CV",canvas3);
+	waitKey(0);
+	return 0;
+}

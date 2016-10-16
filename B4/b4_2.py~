@@ -1,0 +1,11 @@
+import json
+
+
+
+board =[[0 for x in range(8)] for x in range(8)]
+if __name__ ='__main__':
+	data = []
+	with open('input.json') as f:
+		data.load(f)
+	board[0]["start"]=1
+	
